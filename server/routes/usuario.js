@@ -3,8 +3,9 @@ const bcrypt = require('bcrypt');
 const _ = require('underscore');
 const Usuario = require('../models/usuario');
 const app = express();
+const { verificarToken, validarRoleAdmin } = require('../middlewares/autentificacion');
 
-app.get('/usuario', function(req, res) {
+app.get('/usuario', verificarToken, (req, res) => {
 
     //Se obtiene inicia un parametro o sino es 0
     let inicia = req.query.inicia || 0;
@@ -23,27 +24,28 @@ app.get('/usuario', function(req, res) {
                     ok: false,
                     err
                 });
+            } else {
+                res.json({
+                    ok: true,
+                    usuario: usuariosDB
+                });
             }
-            res.status(200).json({
-                ok: true,
-                usuariosDB
-            });
             //Utilizar count y aplicacion de condiccion en estatus
             //Usuario.count({ estado: true }
-            Usuario.count({ estado: true }, (err, totalReg) => {
+            /*  Usuario.countDocuments({ estado: true }, (err, totalReg) => {
 
-                res.status(200).json({
-                    ok: true,
-                    usuariosDB,
-                    totalReg
-                });
-            });
+                  res.status(200).json({
+                      ok: true,
+                      usuariosDB,
+                      totalReg
+                  });
+              });*/
 
         });
 
 });
 
-app.post('/usuario', function(req, res) {
+app.post('/usuario', verificarToken, (req, res) => {
     let body = req.body;
 
     let usuario = new Usuario({
@@ -60,18 +62,14 @@ app.post('/usuario', function(req, res) {
                 mensaje: err
             });
         }
-
         res.json({
             ok: true,
             usuario: usuarioDB
         });
-
     });
-
-
 });
 
-app.put('/usuario/:id', function(req, res) {
+app.put('/usuario/:id', [verificarToken, validarRoleAdmin], (req, res) => {
 
     let id = req.params.id;
     //let body = req.body; todo el objeto body...primera opcion
@@ -82,7 +80,7 @@ app.put('/usuario/:id', function(req, res) {
 
     //delete body.password; podria utlizarse para quitar objetos pero es ineficiente
 
-    //Actualizar Registro findById
+    //Actualizar Registro findById findByIdAndUpdate
     Usuario.findByIdAndUpdate(id, body, { new: true, runValidators: true }, (err, usuarioDB) => {
 
         if (err) {
@@ -100,15 +98,12 @@ app.put('/usuario/:id', function(req, res) {
 
 });
 
-app.delete('/usuario/:id', function(req, res) {
+app.delete('/usuario/:id', [verificarToken, validarRoleAdmin], (req, res) => {
 
     let id = req.params.id;
-
     let cambioEstado = { estado: false };
     //Remueve metedo fisicamente
     // Usuario.findByIdAndRemove(id, (err, usuarioDB) => {
-
-
 
     Usuario.findByIdAndUpdate(id, cambioEstado, { new: true }, (err, usuarioDB) => {
 

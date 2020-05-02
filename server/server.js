@@ -9,8 +9,8 @@ app.use(bodyParser.urlencoded({ extended: false }));
 // parse application/json
 app.use(bodyParser.json());
 
-//para obtener las rutas de usuario.js endpoints
-app.use(require('./routes/usuario'));
+//configuracion global obtener las rutas de usuario y los demas endpoints
+app.use(require('./routes/index'));
 
 //conexion a la base de datos
 mongoose.set('useCreateIndex', true);
