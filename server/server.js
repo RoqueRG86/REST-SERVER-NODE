@@ -3,11 +3,15 @@ const express = require('express');
 const mongoose = require('mongoose'); //paqueteria de mongoDB conexion BD
 const bodyParser = require('body-parser');
 const app = express();
+const path = require('path');
 
 // parse application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: false }));
 // parse application/json
 app.use(bodyParser.json());
+
+//habilitar carpeta public
+app.use(express.static(path.resolve(__dirname, '../public')));
 
 //configuracion global obtener las rutas de usuario y los demas endpoints
 app.use(require('./routes/index'));

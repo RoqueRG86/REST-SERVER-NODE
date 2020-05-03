@@ -28,7 +28,7 @@ const verificarToken = (req, res, next) => {
 const validarRoleAdmin = (req, res, next) => {
 
     let usuario = req.usuario;
-
+    console.log('Rol :', usuario.role);
     if (usuario.role === 'ADMIN_ROLE') {
         next();
     } else {
